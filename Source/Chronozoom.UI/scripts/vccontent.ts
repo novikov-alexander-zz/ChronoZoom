@@ -142,6 +142,12 @@ module CZ {
             if (vw <= 0 || vh <= 0) throw "Image size must be positive";
             return addChild(element, new CanvasImage(element.vc, layerid, id, imgSrc, vx, vy, vw, vh, onload), false);
         };
+
+        export var addHintImage = function (element, layerid, id, vx, vy, vw, vh, onload?) {
+            if (vw <= 0 || vh <= 0) throw "Image size must be positive";
+            return addChild(element, new CanvasHintImage(element.vc, layerid, id, vx, vy, vw, vh, onload), false);
+        };
+
         export var addLodImage = function (element, layerid, id, vx, vy, vw, vh, imgSources, onload?) {
             if (vw <= 0 || vh <= 0) throw "Image size must be positive";
             return addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
@@ -475,6 +481,17 @@ module CZ {
                     render(this.children[i], contexts, visibleBox_v, viewport2d, 1.0);
                 }
 
+                
+                if (n === NaN || n === 0) {
+                    $('#vc').css('background-image', '/images/Empty_canvas_hint_bg_large_1.png');
+                    $('#vc').css('background-size', 'auto');
+                }
+                else {
+                    $('#vc').css('background-image', CZ.Settings.canvasBgImage);
+                }
+
+                $('#vc').css('background-color', CZ.Settings.canvasBgColor);
+
                 if (this.vc.breadCrumbs.length > 0 && (this.vc.recentBreadCrumb == undefined || this.vc.breadCrumbs[vc.breadCrumbs.length - 1].vcElement.id != this.vc.recentBreadCrumb.vcElement.id)) { //the deepest bread crumb is changed
                     this.vc.recentBreadCrumb = this.vc.breadCrumbs[vc.breadCrumbs.length - 1];
                     this.vc.breadCrumbsChanged();
@@ -485,6 +502,82 @@ module CZ {
                         this.vc.breadCrumbsChanged();
                     }
                 }
+            };
+
+            this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
+        }
+
+        /*****************************************************************************************/
+        /* Shows hint messege on canvas                                                          */
+        function CanvasHintImage(vc, layerid, id, vx, vy, vw, vh, onload?) {
+            this.base = CanvasElement;
+            this.base(vc, layerid, id, vx, vy, vw, vh);
+            this.onload = onload;
+            this.imageSource = "/images/Empty_canvas_hint_bg_large_1.png"
+
+            this.isLoading = true; // I am async
+            var img = new Image(); // todo: be aware and do not get circular reference here! 
+            this.img = img;
+            this.img.isLoaded = false;
+
+            var self = this;
+            var onCanvasHintImageLoad = function (s) { // in FireFox "s" doesn't contain any reference to the image, so we use closure here
+                img['isLoading'] = false;
+                if (!img['isRemoved']) {
+                    // adjusting aspect ratio
+                    if (img.naturalHeight) {
+                        var ar0 = self.width / self.height;
+                        var ar1 = img.naturalWidth / img.naturalHeight;
+                        if (ar0 > ar1) {
+                            // vh ~ img.height, vw is to be adjusted
+                            var imgWidth = ar1 * self.height;
+                            var offset = (self.width - imgWidth) / 2.0;
+                            self.x += offset;
+                            self.width = imgWidth;
+                        } else if (ar0 < ar1) {
+                            // vw ~ img.width, vh is to be adjusted
+                            var imgHeight = self.width / ar1;
+                            var offset = (self.height - imgHeight) / 2.0;
+                            self.y += offset;
+                            self.height = imgHeight;
+                        }
+                    }
+
+                    img['isLoaded'] = true;
+                    if (self.onLoad) self.onLoad();
+                    self.vc.requestInvalidate();
+                } else {
+                    delete img['isRemoved'];
+                    delete img['isLoaded'];
+                }
+            };
+            var onCanvasHintImageLoadError = function (e) {
+                if (!img['isFallback']) {
+                    img['isFallback'] = true;
+                    img.src = "";
+                } else {
+                    throw "Cannot load an image!";
+                }
+            };
+
+            this.img.addEventListener("load", onCanvasHintImageLoad, false);
+            if (onload)
+                this.img.addEventListener("load", onload, false);
+            this.img.addEventListener("error", onCanvasHintImageLoadError, false);
+            this.img.src = this.imageSource; // todo: stop image loading if it is not needed anymore (see http://stackoverflow.com/questions/1339901/stop-loading-of-images-with-javascript-lazyload)
+
+            this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if (!this.img.isLoaded) return;
+                var p = viewport2d.pointVirtualToScreen(this.x, this.y);
+                ctx.globalAlpha = opacity;
+                ctx.drawImage(this.img, p.x, p.y, size_p.x, size_p.y);
+            };
+            this.onRemove = function () {
+                this.img.removeEventListener("load", onCanvasHintImageLoad, false);
+                this.img.removeEventListener("error", onCanvasHintImageLoadError, false);
+                if (this.onload) this.img.removeEventListener("load", this.onload, false);
+                this.img.isRemoved = true;
+                delete this.img;
             };
 
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);

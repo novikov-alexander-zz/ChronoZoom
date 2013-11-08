@@ -33,6 +33,10 @@ var CZ;
 
         Settings.fallbackImageUri = '/images/Temp-Thumbnail2.png';
 
+        // Common canvas properties
+        Settings.canvasBgImage = "none";
+        Settings.canvasBgColor = "#232323";
+
         // Styles of timelines
         Settings.timelineHeaderMargin = 1.0 / 18.0;
         Settings.timelineHeaderSize = 1.0 / 9.0;
@@ -218,8 +222,11 @@ var CZ;
             };
 
             var themeSettings = themeData[theme];
-            $('#vc').css('background-image', themeSettings.background);
-            $('#vc').css('background-color', themeSettings.backgroundColor);
+            CZ.Settings.canvasBgImage = themeSettings.background;
+            CZ.Settings.canvasBgColor = themeSettings.backgroundColor;
+
+            //$('#vc').css('background-image', themeSettings.background);
+            //$('#vc').css('background-color', themeSettings.backgroundColor);
             CZ.Settings.timelineColor = themeSettings.timelineColor;
             CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
             CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
@@ -1363,7 +1370,7 @@ var CZ;
         function CanvasRootElement(vc, layerid, id, vx, vy, vw, vh) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
-            this.opacity = 0;
+            this.opacity = 1;
 
             /* Overrides base function. Root element is visible when it has at least one child. */
             this.isVisible = function (visibleBox_v) {
@@ -1409,6 +1416,15 @@ var CZ;
                 for (var i = 0; i < n; i++) {
                     VCContent.render(this.children[i], contexts, visibleBox_v, viewport2d, 1.0);
                 }
+
+                if (n === NaN || n === 0) {
+                    $('#vc').css('background-image', '/images/Empty_canvas_hint_bg_large_1.png');
+                    $('#vc').css('background-size', 'auto');
+                } else {
+                    $('#vc').css('background-image', CZ.Settings.canvasBgImage);
+                }
+
+                $('#vc').css('background-color', CZ.Settings.canvasBgColor);
 
                 if (this.vc.breadCrumbs.length > 0 && (this.vc.recentBreadCrumb == undefined || this.vc.breadCrumbs[vc.breadCrumbs.length - 1].vcElement.id != this.vc.recentBreadCrumb.vcElement.id)) {
                     this.vc.recentBreadCrumb = this.vc.breadCrumbs[vc.breadCrumbs.length - 1];
@@ -17694,9 +17710,10 @@ else
                     CZ.Common.loadData().then(function (response) {
                         if (!response) {
                             if (CZ.Authoring.isEnabled) {
-                                if (CZ.Authoring.showCreateRootTimelineForm) {
-                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
-                                }
+                                //if (CZ.Authoring.showCreateRootTimelineForm) {
+                                //    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
+                                //}
+                                //$('#vc').css('background-image', "url('/images/Empty_canvas_hint_bg_medium.png')");
                             } else {
                                 CZ.Authoring.showMessageWindow("Looks like this collection is empty. Come back later when author will fill it with content.", "Collection is empty :(");
                             }

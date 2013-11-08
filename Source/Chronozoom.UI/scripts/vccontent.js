@@ -74,6 +74,13 @@
                 throw "Image size must be positive";
             return VCContent.addChild(element, new CanvasImage(element.vc, layerid, id, imgSrc, vx, vy, vw, vh, onload), false);
         };
+
+        VCContent.addHintImage = function (element, layerid, id, vx, vy, vw, vh, onload) {
+            if (vw <= 0 || vh <= 0)
+                throw "Image size must be positive";
+            return VCContent.addChild(element, new CanvasHintImage(element.vc, layerid, id, vx, vy, vw, vh, onload), false);
+        };
+
         VCContent.addLodImage = function (element, layerid, id, vx, vy, vw, vh, imgSources, onload) {
             if (vw <= 0 || vh <= 0)
                 throw "Image size must be positive";
@@ -278,6 +285,15 @@
                     VCContent.render(this.children[i], contexts, visibleBox_v, viewport2d, 1.0);
                 }
 
+                if (n === NaN || n === 0) {
+                    $('#vc').css('background-image', '/images/Empty_canvas_hint_bg_large_1.png');
+                    $('#vc').css('background-size', 'auto');
+                } else {
+                    $('#vc').css('background-image', CZ.Settings.canvasBgImage);
+                }
+
+                $('#vc').css('background-color', CZ.Settings.canvasBgColor);
+
                 if (this.vc.breadCrumbs.length > 0 && (this.vc.recentBreadCrumb == undefined || this.vc.breadCrumbs[vc.breadCrumbs.length - 1].vcElement.id != this.vc.recentBreadCrumb.vcElement.id)) {
                     this.vc.recentBreadCrumb = this.vc.breadCrumbs[vc.breadCrumbs.length - 1];
                     this.vc.breadCrumbsChanged();
@@ -292,6 +308,80 @@
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
         VCContent.CanvasRootElement = CanvasRootElement;
+
+        function CanvasHintImage(vc, layerid, id, vx, vy, vw, vh, onload) {
+            this.base = CanvasElement;
+            this.base(vc, layerid, id, vx, vy, vw, vh);
+            this.onload = onload;
+            this.imageSource = "/images/Empty_canvas_hint_bg_large_1.png";
+
+            this.isLoading = true;
+            var img = new Image();
+            this.img = img;
+            this.img.isLoaded = false;
+
+            var self = this;
+            var onCanvasHintImageLoad = function (s) {
+                img['isLoading'] = false;
+                if (!img['isRemoved']) {
+                    if (img.naturalHeight) {
+                        var ar0 = self.width / self.height;
+                        var ar1 = img.naturalWidth / img.naturalHeight;
+                        if (ar0 > ar1) {
+                            var imgWidth = ar1 * self.height;
+                            var offset = (self.width - imgWidth) / 2.0;
+                            self.x += offset;
+                            self.width = imgWidth;
+                        } else if (ar0 < ar1) {
+                            var imgHeight = self.width / ar1;
+                            var offset = (self.height - imgHeight) / 2.0;
+                            self.y += offset;
+                            self.height = imgHeight;
+                        }
+                    }
+
+                    img['isLoaded'] = true;
+                    if (self.onLoad)
+                        self.onLoad();
+                    self.vc.requestInvalidate();
+                } else {
+                    delete img['isRemoved'];
+                    delete img['isLoaded'];
+                }
+            };
+            var onCanvasHintImageLoadError = function (e) {
+                if (!img['isFallback']) {
+                    img['isFallback'] = true;
+                    img.src = "";
+                } else {
+                    throw "Cannot load an image!";
+                }
+            };
+
+            this.img.addEventListener("load", onCanvasHintImageLoad, false);
+            if (onload)
+                this.img.addEventListener("load", onload, false);
+            this.img.addEventListener("error", onCanvasHintImageLoadError, false);
+            this.img.src = this.imageSource;
+
+            this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if (!this.img.isLoaded)
+                    return;
+                var p = viewport2d.pointVirtualToScreen(this.x, this.y);
+                ctx.globalAlpha = opacity;
+                ctx.drawImage(this.img, p.x, p.y, size_p.x, size_p.y);
+            };
+            this.onRemove = function () {
+                this.img.removeEventListener("load", onCanvasHintImageLoad, false);
+                this.img.removeEventListener("error", onCanvasHintImageLoadError, false);
+                if (this.onload)
+                    this.img.removeEventListener("load", this.onload, false);
+                this.img.isRemoved = true;
+                delete this.img;
+            };
+
+            this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
+        }
 
         function getZoomLevel(size_p) {
             var sz = Math.max(size_p.x, size_p.y);

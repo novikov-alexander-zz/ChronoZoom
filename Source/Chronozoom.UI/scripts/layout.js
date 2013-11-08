@@ -1,13 +1,13 @@
-﻿var CZ;
+var CZ;
 (function (CZ) {
     (function (Layout) {
         var isLayoutAnimation = true;
 
-        Layout.animatingElements = {
+        var animatingElements = {
             length: 0
         };
 
-        Layout.timelineHeightRate = 0.4;
+        var timelineHeightRate = 0.4;
 
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
@@ -450,7 +450,7 @@ else
             }
         }
 
-        Layout.FindChildTimeline = function (timeline, id, recursive) {
+        var FindChildTimeline = function (timeline, id, recursive) {
             var result = undefined;
 
             if (timeline && timeline.timelines instanceof Array) {
@@ -462,7 +462,7 @@ else
                         break;
                     } else {
                         if (recursive == true) {
-                            result = Layout.FindChildTimeline(childTimeline, id, recursive);
+                            result = FindChildTimeline(childTimeline, id, recursive);
                             if (result != undefined)
                                 break;
                         }
@@ -643,9 +643,9 @@ else
                 args: args
             };
 
-            if (typeof Layout.animatingElements[elem.id] === 'undefined') {
-                Layout.animatingElements[elem.id] = elem;
-                Layout.animatingElements.length++;
+            if (typeof animatingElements[elem.id] === 'undefined') {
+                animatingElements[elem.id] = elem;
+                animatingElements.length++;
             }
 
             elem.calculateNewFrame = function () {
@@ -668,8 +668,8 @@ else
                     elem.animation.isAnimating = false;
                     elem.animation.args = [];
 
-                    delete Layout.animatingElements[elem.id];
-                    Layout.animatingElements.length--;
+                    delete animatingElements[elem.id];
+                    animatingElements.length--;
 
                     if (elem.fadeIn == false)
                         elem.fadeIn = true;

@@ -522,12 +522,14 @@ module CZ {
                     CZ.Common.loadData().then(function (response) {
                         // collection is empty
                         if (!response) {
-                            // author should create a root timeline
+                            // Show hint background
                             // TODO: store 'user' variable in CZ that is the response of getProfile()
                             if (CZ.Authoring.isEnabled) {
-                                if (CZ.Authoring.showCreateRootTimelineForm) {
-                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
-                                }
+                                //if (CZ.Authoring.showCreateRootTimelineForm) {
+                                //    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
+                                //}
+                                CZ.VCContent.
+                                //$('#vc').css('background-image', "url('/images/Empty_canvas_hint_bg_medium.png')");
                             }
                             // show message for other users that collection is empty
                             else {

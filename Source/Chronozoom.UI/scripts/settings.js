@@ -31,6 +31,9 @@
 
         Settings.fallbackImageUri = '/images/Temp-Thumbnail2.png';
 
+        Settings.canvasBgImage = "none";
+        Settings.canvasBgColor = "#232323";
+
         Settings.timelineHeaderMargin = 1.0 / 18.0;
         Settings.timelineHeaderSize = 1.0 / 9.0;
         Settings.timelineTooltipMaxHeaderSize = 5;
@@ -202,8 +205,9 @@
             };
 
             var themeSettings = themeData[theme];
-            $('#vc').css('background-image', themeSettings.background);
-            $('#vc').css('background-color', themeSettings.backgroundColor);
+            CZ.Settings.canvasBgImage = themeSettings.background;
+            CZ.Settings.canvasBgColor = themeSettings.backgroundColor;
+
             CZ.Settings.timelineColor = themeSettings.timelineColor;
             CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
             CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;

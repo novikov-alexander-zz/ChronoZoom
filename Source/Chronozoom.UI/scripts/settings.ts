@@ -33,6 +33,10 @@ module CZ {
 
         export var fallbackImageUri = '/images/Temp-Thumbnail2.png'; // the image that is shown when thumbnail loading fails (e.g. database is unavailable)
 
+        // Common canvas properties
+        export var canvasBgImage = "none";
+        export var canvasBgColor = "#232323";
+
         // Styles of timelines
         export var timelineHeaderMargin = 1.0 / 18.0;  // size of left margins, relative to height of the timeline.
         export var timelineHeaderSize = 1.0 / 9.0;    // header's font size, relative to height of the timeline
@@ -220,8 +224,10 @@ module CZ {
             }
 
             var themeSettings = themeData[theme];
-            $('#vc').css('background-image', themeSettings.background);
-            $('#vc').css('background-color', themeSettings.backgroundColor);
+            CZ.Settings.canvasBgImage = themeSettings.background;
+            CZ.Settings.canvasBgColor = themeSettings.backgroundColor;
+            //$('#vc').css('background-image', themeSettings.background);
+            //$('#vc').css('background-color', themeSettings.backgroundColor);
             CZ.Settings.timelineColor = themeSettings.timelineColor;
             CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
             CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;

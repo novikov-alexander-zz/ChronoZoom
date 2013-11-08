@@ -462,9 +462,6 @@ else
                     CZ.Common.loadData().then(function (response) {
                         if (!response) {
                             if (CZ.Authoring.isEnabled) {
-                                if (CZ.Authoring.showCreateRootTimelineForm) {
-                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
-                                }
                             } else {
                                 CZ.Authoring.showMessageWindow("Looks like this collection is empty. Come back later when author will fill it with content.", "Collection is empty :(");
                             }
