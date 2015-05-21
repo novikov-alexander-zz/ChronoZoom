@@ -1,6 +1,6 @@
 ﻿IF NOT EXISTS (SELECT * FROM sys.columns  WHERE [name] = N'OffsetY' AND [object_id] = OBJECT_ID(N'Exhibits'))
 BEGIN
-	ALTER TABLE [Exhibits] ADD [OffsetY] DECIMAL (5, 2) NULL;
+	ALTER TABLE [Timelines] ADD [OffsetY] DECIMAL (5, 2) NULL;
 END
 GO
 
