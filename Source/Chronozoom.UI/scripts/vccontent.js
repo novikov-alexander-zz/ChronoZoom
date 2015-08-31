@@ -1176,7 +1176,7 @@ var CZ;
                     this.pasteButton.onmousehover = function (event)
                     {
                         this.vc.element.css('cursor', 'pointer');
-                        this.vc.element.attr('title', 'Paste Timeline');
+                        this.vc.element.attr('title', 'Paste Timeline/Exhibit');
                         this.parent.settings.strokeStyle = "yellow";
                     }
 
@@ -1190,11 +1190,22 @@ var CZ;
                     this.pasteButton.onmouseclick = function (event)
                     {
                         var newTimeline = localStorage.getItem('ExportedTimeline');
+                        var newExhibit = localStorage.getItem('ExportedExhibit');
 
-                        if ((localStorage.getItem('ExportedSchemaVersion') == constants.schemaVersion) && newTimeline != null)
+                        var sameDbSchema = localStorage.getItem('ExportedSchemaVersion') == constants.schemaVersion;
+
+                        if (sameDbSchema && newTimeline != null)
                         {
                             // timeline from same db schema version is on "clipboard" so attempt "paste"
                             CZ.Service.importTimelines(this.parent.guid, newTimeline).then(function (importMessage)
+                            {
+                                CZ.Authoring.showMessageWindow(importMessage);
+                            });
+                        }
+                        else if (sameDbSchema && newExhibit != null)
+                        {
+                            // exhibit from same db schema version is on "clipboard" so attempt "paste"
+                            CZ.Service.importExhibit(this.parent.guid, newExhibit).then(function (importMessage)
                             {
                                 CZ.Authoring.showMessageWindow(importMessage);
                             });
@@ -1245,7 +1256,8 @@ var CZ;
                         CZ.Service.exportTimelines(this.parent.guid).then(function (exportData)
                         {
                             localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
-                            localStorage.setItem('ExportedTimeline',      JSON.stringify(exportData));
+                            localStorage.setItem('ExportedTimeline', JSON.stringify(exportData));
+                            localStorage.removeItem('ExportedExhibit');
                             CZ.Authoring.showMessageWindow('"' + exportData[0].timeline.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
                         });
                     }
@@ -2789,20 +2801,21 @@ var CZ;
                         numberOfLines: 2
                     }, titleWidth);
 
-                    //adding edit button
+                    var imageSize = (titleTop - infodot.y) * 0.75;
+                    
+                    //adding edit and copy button
                     if (CZ.Authoring.isEnabled) {
-                        var imageSize = (titleTop - infodot.y) * 0.75;
-                        var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time - imageSize / 2, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
+                        var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
+                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
 
                         editButton.reactsOnMouse = true;
-
                         editButton.onmouseclick = function () {
                             CZ.Authoring.isActive = true;
                             CZ.Authoring.mode = "editExhibit";
                             CZ.Authoring.selectedExhibit = infodot;
                             return true;
                         };
-
+ 
                         editButton.onmouseenter = function ()
                         {
                             this.vc.element.css('cursor', 'pointer');
@@ -2816,7 +2829,38 @@ var CZ;
                             this.vc.element.attr('title', '');
                             infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
                         };
+
                     }
+                    else
+                    {
+                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize / 2, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
+                    }
+                    copyButton.reactsOnMouse = true;
+
+                    copyButton.onmouseclick = function () {
+                        CZ.Service.exportExhibit(this.parent.guid).then(function (exportData) {
+                            localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
+                            localStorage.setItem('ExportedExhibit', JSON.stringify(exportData));
+                            localStorage.removeItem('ExportedTimeline');
+                            CZ.Authoring.showMessageWindow('"' + exportData.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
+                        });
+                        return true;
+                    };
+
+                    copyButton.onmouseenter = function () {
+                        this.vc.element.css('cursor', 'pointer');
+                        this.vc.element.attr('title', 'Copy Exhibit to Clipboard');
+                        infodot.settings.strokeStyle = "yellow";
+                    };
+
+                    copyButton.onmouseleave = function () {
+                        this.vc.element.css('cursor', 'default');
+                        this.vc.element.attr('title', '');
+                        infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
+                    };
+
+
+
 
                     var biblBottom = vyc + centralSquareSize + 63.0 / 450 * 2 * radv;
                     var biblHeight = CZ.Settings.infodotBibliographyHeight * radv * 2;
