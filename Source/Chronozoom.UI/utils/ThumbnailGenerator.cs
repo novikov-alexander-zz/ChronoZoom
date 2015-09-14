@@ -40,7 +40,7 @@ namespace Chronozoom.UI.Utils
         /// <param name="contentItem"></param>
         internal void CreateThumbnails(ContentItem contentItem)
         {
-            if (contentItem == null || _thumbnailsStorage == null || contentItem.Uri == null || string.Compare(contentItem.MediaType, "Image", StringComparison.OrdinalIgnoreCase) != 0)
+            if (contentItem == null || _thumbnailsStorage == null || contentItem.Uri == null || (string.Compare(contentItem.MediaType, "Image", StringComparison.OrdinalIgnoreCase) != 0 && string.Compare(contentItem.MediaType, "skydrive-image", StringComparison.OrdinalIgnoreCase) != 0))
                 return;
 
             // Retrieve storage account information
