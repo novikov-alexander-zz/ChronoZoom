@@ -1,6 +1,4 @@
 ﻿using Microsoft.SqlServer;
-using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Smo;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -9,6 +7,8 @@ using System.Data.SqlServerCe;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Smo;
 
 namespace Chronozoom.Entities
 {

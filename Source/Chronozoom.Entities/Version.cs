@@ -1,6 +1,4 @@
 ﻿using Microsoft.SqlServer;
-using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Smo;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

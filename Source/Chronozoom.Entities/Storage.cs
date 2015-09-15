@@ -14,9 +14,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
-using Microsoft.Practices.TransientFaultHandling;
-using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling;
-using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.AzureStorage;
+using Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling;
+
 
 namespace Chronozoom.Entities
 {

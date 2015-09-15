@@ -1,6 +1,5 @@
 ﻿/// <reference path="../../../Chronozoom.UI/ui/controls/formbase.js" />
 /// <reference path="../../../Chronozoom.UI/ui/header-edit-profile-form.js" />
-
 var formEditProfile = CZ.UI.FormEditProfile.prototype;
 
 describe("validEmail() method", function () {

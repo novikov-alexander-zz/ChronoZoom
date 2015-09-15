@@ -1,7 +1,7 @@
 using System;
 using System.Web.Mvc;
 
-namespace BillManager.Web.Controllers
+namespace Chronozoom.UI.UnitTests.Controllers
 {
     public class JasmineController : Controller
     {
