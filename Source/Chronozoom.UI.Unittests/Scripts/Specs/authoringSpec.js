@@ -1,7 +1,7 @@
 ﻿/// <reference path="../../../Chronozoom.UI/scripts/settings.js" />
 /// <reference path="../../../Chronozoom.UI/scripts/authoring.js" />
 /// <reference path="../../../Chronozoom.UI/scripts/dates.js" />
-/// <reference path='../../../Chronozoom.UI/scripts/external/jquery-1.7.2.min.js'/>
+/// <reference path='../../../Chronozoom.UI/scripts/external/jquery-2.1.4.min.js'/>
 /// <reference path="../../../Chronozoom.UI/scripts/service.js" />
 
 describe("CZ.Authoring part", function () {

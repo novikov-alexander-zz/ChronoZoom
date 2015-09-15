@@ -88,7 +88,6 @@ namespace Chronozoom.UI
             Trace.Listeners.Add(SignalRTraceListener);
             Storage.Trace.Listeners.Add(SignalRTraceListener);
 
-            RouteTable.Routes.MapHubs();
             RegisterRoutes(RouteTable.Routes);
 
             BundleTable.EnableOptimizations = true; // enables bundling for debug mode
